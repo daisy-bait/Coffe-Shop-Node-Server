@@ -1,7 +1,7 @@
 import express from "express";
 import configEnv from "./config/config.env.js";
 import configExpress from "./config/config.express.js";
-import { configDb } from "./config/config.db.js";
+import { configDb } from "./config/config.db.js"
 
 /**
  * Cargamos la constante de todas las utilidades de express, le ponemos app, pero puede llamarse como queramos
@@ -11,6 +11,7 @@ const app = express();
 /**
  * Configuramos express de una vez mediante nuestra clase de Utilidad
  * Se configura aparte para no acaparar mucho código en este archivo
+ * Nota: Aquí estamos configurando las Rutas, o Endpoints
  */
 configExpress(app);
 
