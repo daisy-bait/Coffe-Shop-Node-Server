@@ -1,0 +1,188 @@
+name: Validate Jira Story in Commit
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate-commit:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install axios
+    
+    - name: Validate Jira Story
+      env:
+        JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+        JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        PROJECT_KEY: "COFFE"
+      run: |
+        cat > validate-commit.js << 'EOF'
+        const axios = require('axios');
+        const { execSync } = require('child_process');
+
+        // Configuración de Jira
+        const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
+        const JIRA_EMAIL = process.env.JIRA_EMAIL;
+        const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
+        const PROJECT_KEY = process.env.PROJECT_KEY;
+
+        // Configurar autenticación para Jira
+        const jiraAuth = Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64');
+
+        async function validateJiraStory(issueKey) {
+          try {
+            console.log(`🔍 Validando historia: ${issueKey}`);
+            
+            const response = await axios.get(
+              `${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}`,
+              {
+                headers: {
+                  'Authorization': `Basic ${jiraAuth}`,
+                  'Accept': 'application/json'
+                }
+              }
+            );
+
+            const issue = response.data;
+            
+            // Verificar que sea una Story
+            const issueType = issue.fields.issuetype.name.toLowerCase();
+            if (issueType !== 'story') {
+              throw new Error(`❌ El issue ${issueKey} es de tipo '${issue.fields.issuetype.name}', pero debe ser una 'Story'`);
+            }
+            
+            // Verificar el estado
+            const status = issue.fields.status.name.toLowerCase();
+            const validStatuses = ['ANALIZANDO', 'EN CURSO'];
+            
+            if (!validStatuses.some(validStatus => status.includes(validStatus.toLowerCase()))) {
+              throw new Error(`❌ El issue ${issueKey} está en estado '${issue.fields.status.name}', pero debe estar 'In Progress'`);
+            }
+            
+            console.log(`✅ Historia ${issueKey} validada correctamente:`);
+            console.log(`   - Tipo: ${issue.fields.issuetype.name}`);
+            console.log(`   - Estado: ${issue.fields.status.name}`);
+            console.log(`   - Resumen: ${issue.fields.summary}`);
+            
+            return true;
+            
+          } catch (error) {
+            if (error.response && error.response.status === 404) {
+              throw new Error(`❌ La historia ${issueKey} no existe en Jira`);
+            }
+            throw error;
+          }
+        }
+
+        function extractJiraKeys(commitMessage) {
+          // Regex para encontrar códigos COFFE-XXXX
+          const regex = new RegExp(`${PROJECT_KEY}-\\d+`, 'gi');
+          const matches = commitMessage.match(regex);
+          return matches ? [...new Set(matches.map(match => match.toUpperCase()))] : [];
+        }
+
+        async function validateCommits() {
+          try {
+            // Obtener los commits del push
+            let commits = [];
+            
+            if (process.env.GITHUB_EVENT_NAME === 'push') {
+              const beforeSha = process.env.GITHUB_EVENT_BEFORE || 'HEAD~1';
+              const afterSha = process.env.GITHUB_SHA;
+              
+              try {
+                const commitRange = `${beforeSha}..${afterSha}`;
+                const gitLog = execSync(`git log ${commitRange} --pretty=format:"%H|%s"`, { encoding: 'utf8' });
+                
+                if (gitLog.trim()) {
+                  commits = gitLog.trim().split('\n').map(line => {
+                    const [hash, message] = line.split('|');
+                    return { hash, message };
+                  });
+                }
+              } catch (error) {
+                // Si hay error con el rango, usar solo el último commit
+                const gitLog = execSync('git log -1 --pretty=format:"%H|%s"', { encoding: 'utf8' });
+                const [hash, message] = gitLog.split('|');
+                commits = [{ hash, message }];
+              }
+            } else {
+              // Para pull requests, validar todos los commits en el PR
+              const gitLog = execSync('git log origin/main..HEAD --pretty=format:"%H|%s"', { encoding: 'utf8' });
+              commits = gitLog.trim().split('\n').map(line => {
+                const [hash, message] = line.split('|');
+                return { hash, message };
+              });
+            }
+
+            console.log(`📝 Validando ${commits.length} commit(s)...`);
+            
+            let hasValidationErrors = false;
+            
+            for (const commit of commits) {
+              console.log(`\n🔍 Analizando commit: ${commit.hash.substring(0, 7)}`);
+              console.log(`   Mensaje: ${commit.message}`);
+              
+              // Extraer códigos Jira del mensaje del commit
+              const jiraKeys = extractJiraKeys(commit.message);
+              
+              if (jiraKeys.length === 0) {
+                console.log(`❌ El commit ${commit.hash.substring(0, 7)} no contiene ningún código de historia técnica ${PROJECT_KEY}-XXXX`);
+                hasValidationErrors = true;
+                continue;
+              }
+              
+              console.log(`   Historias encontradas: ${jiraKeys.join(', ')}`);
+              
+              // Validar cada historia técnica encontrada
+              for (const jiraKey of jiraKeys) {
+                try {
+                  await validateJiraStory(jiraKey);
+                } catch (error) {
+                  console.log(`❌ Error en commit ${commit.hash.substring(0, 7)}: ${error.message}`);
+                  hasValidationErrors = true;
+                }
+              }
+            }
+            
+            if (hasValidationErrors) {
+              console.log('\n💥 Validación fallida. Por favor corrige los errores antes de continuar.');
+              process.exit(1);
+            } else {
+              console.log('\n🎉 Todos los commits han sido validados correctamente!');
+            }
+            
+          } catch (error) {
+            console.error('❌ Error durante la validación:', error.message);
+            process.exit(1);
+          }
+        }
+
+        // Ejecutar validación
+        validateCommits();
+        EOF
+        
+        node validate-commit.js
+
+    - name: Success message
+      if: success()
+      run: |
+        echo "🎉 ¡Validación completada exitosamente!"
+        echo "Todos los commits cumplen con las reglas de Jira."
