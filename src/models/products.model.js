@@ -15,6 +15,8 @@ const productSchema = new mongoose.Schema(
         category: {
             type: mongoose.Types.ObjectId,
             ref: "ProductCategory",
+            required: false,
+            unique: false,
         },
         price: {
             type: Number,
@@ -24,11 +26,28 @@ const productSchema = new mongoose.Schema(
         },
         stock: {
             type: Number,
-            required: true,
+            required: false,
             unique: false,
             min: 0,
         },
+        origin: {
+            type: String,
+            required: false,
+            unique: false,
+        },
+        recommendations: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        benefits: [{
+            type: String,
+            required: false,
+            unique: false,
+        }]
     }, {
         timestamps: true,
     }
 )
+
+export default mongoose.model("Product", productSchema);

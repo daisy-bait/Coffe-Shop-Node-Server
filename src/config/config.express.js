@@ -2,6 +2,8 @@ import express from "express";
 import morgan from "morgan";
 
 import roleRoutes from "../routes/role.route.js"
+import productRoutes from "../routes/product.route.js"
+import productCategoryRoutes from "../routes/productCategory.route.js"
 
 /**
  * @description Función para configurar express para:
@@ -19,4 +21,6 @@ export default function(app) {
 
     // Rutas, o Endpoints
     app.use("/api/roles", roleRoutes);
+    app.use("/api/products", productRoutes);
+    app.use("/api/product-categories", productCategoryRoutes);
 }
