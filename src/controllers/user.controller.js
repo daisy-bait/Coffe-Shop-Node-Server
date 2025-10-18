@@ -19,3 +19,25 @@ export const registerUser = async (req, res) => {
         return res.status(500).json(error.message);
     }
 };
+
+export const searchUserByParams = async (req, res) => {
+    try {
+        const { id, username, email, name } = req.query;
+        res.json( this.getUser(id, username, email, name));
+    } catch {
+        return res.status(500).json(error.message);
+    }
+};
+
+export const getUser = async (id, username, email, name) => {
+    try {
+        const user = await userModel.find({
+            _id: id,
+            username: username,
+            email: email,
+            name: name
+        })
+    } catch {
+        return res.status(500).json(error.message);
+    }
+};
