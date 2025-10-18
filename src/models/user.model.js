@@ -23,7 +23,10 @@ const userSchema = new mongoose.Schema(
             unique: false,
         },
         roles: [{
-            type: String
+            type: mongoose.Types.ObjectId,
+            ref: "Role",
+            required: true,
+            unique: false,
         }],
     },
     {

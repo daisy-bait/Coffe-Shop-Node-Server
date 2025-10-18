@@ -1,5 +1,6 @@
 import roleModel from "../models/role.model.js";
 import userModel from "../models/user.model.js";
+import bcrypt from "bcrypt";
 
 export const runDataLoader = async() => {
     const savedRoles = await roleModel.find().exec();
@@ -23,15 +24,17 @@ export const runDataLoader = async() => {
     if (savedUsers.length === 0) {
         console.log("[MONGO] Seeding Users...")
 
-        const roleAdmin = roleModel.find({ name: "ADMIN" });
+        const roleAdmin = await roleModel.find({ name: "ADMIN" }).exec();
+        const roles = [ roleAdmin[0] ];
+        const encodedPassword = await bcrypt.hash("200548", 10);
 
         const users = [
             new userModel({
                 username: "admin",
-                password: "200548",
+                password: encodedPassword,
                 email: "u20231213624@usco.edu.co",
                 name: "Kaleth Daniel Narváez Paredes",
-                roles: [ roleAdmin ]
+                roles: roles
             })
         ].map(user => user.save());
 
