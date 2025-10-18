@@ -3,12 +3,10 @@ import ProductCategory from "../models/productCategory.model.js";
 export const createProductCategory = async(req, res) => {
     try {
         const { name, description } = req.body;
-        console.log(name);
         const newProductCategory = new ProductCategory({
             name,
             description
         })
-        console.log(newProductCategory);
         await newProductCategory.save();
         res.status(201).json(newProductCategory);
     } catch(error) {
