@@ -1,5 +1,5 @@
-import userModel from "../models/user.model";
-import roleModel from "../models/role.model";
+import userModel from "../models/user.model.js";
+import roleModel from "../models/role.model.js";
 
 export const registerUser = async (req, res) => {
     try {
@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
         )
         await newUser.save();
         res.status(201).json(newUser);
-    } catch {
+    } catch(error) {
         return res.status(500).json(error.message);
     }
 };
@@ -23,8 +23,9 @@ export const registerUser = async (req, res) => {
 export const searchUserByParams = async (req, res) => {
     try {
         const { id, username, email, name } = req.query;
-        res.json( this.getUser(id, username, email, name));
-    } catch {
+        console.log(id, username, email, name);
+        res.json(this.getUser(id, username, email, name));
+    } catch(error) {
         return res.status(500).json(error.message);
     }
 };
@@ -37,7 +38,7 @@ export const getUser = async (id, username, email, name) => {
             email: email,
             name: name
         })
-    } catch {
+    } catch(error) {
         return res.status(500).json(error.message);
     }
 };
