@@ -27,7 +27,7 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     try {
         const { username, password } = req.body;
-        const registeredUser = userModel.find({ username: username });
+        const registeredUser = await userModel.findOne({ username: username });
 
         if (!registeredUser)
             return res.status(401).json({ message: "Invalid Credentials: Not User Found" });
@@ -42,7 +42,7 @@ export const loginUser = async (req, res) => {
             username: registeredUser.username,
             roles: registeredUser.roles
         })
-        res.status(201).json(token);
+        res.json(token);
     } catch(error) {
         return res.status(500).json(error.message);
     }
@@ -51,7 +51,6 @@ export const loginUser = async (req, res) => {
 export const searchUserByParams = async (req, res) => {
     try {
         const { id, username, email, name } = req.query;
-        console.log(id, username, email, name);
         res.json(await getUser(id, username, email, name));
     } catch(error) {
         return res.status(500).json(error.message);

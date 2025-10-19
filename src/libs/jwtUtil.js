@@ -1,4 +1,4 @@
-import configEnv from "../config/config.env";
+import configEnv from "../config/config.env.js";
 import jwt from "jsonwebtoken";
 import { getUser, searchUserByParams } from "../controllers/user.controller.js";
 
