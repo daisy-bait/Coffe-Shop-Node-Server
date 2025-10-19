@@ -1,7 +1,7 @@
 import userModel from "../models/user.model.js";
 import roleModel from "../models/role.model.js";
 import bcrypt from "bcrypt";
-import { createAccessToken } from "../libs/jwtUtil.js";
+import { createAccessToken, verifyToken } from "../libs/jwtUtil.js";
 
 export const registerUser = async (req, res) => {
     try {
@@ -56,6 +56,17 @@ export const searchUserByParams = async (req, res) => {
         return res.status(500).json(error.message);
     }
 };
+
+export const verifySession = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(" ")[1];
+        res.json(await verifyToken(token));
+    } catch(error) {
+        console.log(error.message);
+    }
+};
+
+// METODOS PRIVADOS
 
 export const getUser = async (id, username, email, name) => {
     try {
