@@ -131,28 +131,28 @@ export const modifyOrderStatus = async (req, res) => {
 
     const toModifyOrder = await orderModel.findOne({ _id: orderId });
 
-    if (toCancelOrder.status === "PENDIENTE") {
-      const modifiedOrder = await orderModel.findOneAndUpdate(
-        { _id: orderId },
-        { status: status },
-        { new: true }
-      );
-    } else {
+    if (toModifyOrder.status !== "PENDIENTE") {
       return res
         .status(400)
         .json({ message: "La orden ya se encuentra cancelada o completada" });
     }
 
+    const modifiedOrder = await orderModel.findOneAndUpdate(
+      { _id: orderId },
+      { status: status },
+      { new: true }
+    );
+
     return res.status(200).json(modifiedOrder);
   } catch (error) {
-    console.error("Error cancelando orden:", error);
+    console.error("Error modificando orden:", error);
     return res
       .status(500)
-      .json({ message: "Error al crear la orden", error: error.message });
+      .json({ message: "Error al modificar la orden", error: error.message });
   }
 };
 
-const searchOrdersByParams = async (req, res) => {
+export const searchOrdersByParams = async (req, res) => {
   try {
     const { username } = req.body;
 
@@ -160,13 +160,15 @@ const searchOrdersByParams = async (req, res) => {
 
     if (!foundUser) {
       return res.status(400).json({
-        message: "No hay un usuario con ese nombre de usuario: username",
+        message: `No hay un usuario con ese nombre de usuario: ${username}`,
       });
     }
 
     const foundOrders = await orderModel
       .find({ client: foundUser._id })
       .sort({ createdAt: -1 });
+
+      return res.status(200).json(foundOrders);
   } catch (error) {
     console.error(error);
     return res
