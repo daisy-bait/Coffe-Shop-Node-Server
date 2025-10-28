@@ -13,13 +13,18 @@ export const createAccessToken = async(payload) => {
     });
 };
 
-export const verifyToken = async(token) => {
+export const verifyToken = async (token) => {
     return jwt.verify(token, configEnv.jwtSecret, async(error, claims) => {
-        if (error) return false;
+        if (error) { 
+            console.log(error);
+            return false;
+        }
 
         const userFound = await getUser(claims.id, undefined, undefined, undefined);
-        if (!userFound) return false;
+        if (!userFound) {
+            return false;
+        }
 
-        return true;
+        return userFound[0];
     })
 }

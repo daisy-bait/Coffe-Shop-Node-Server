@@ -12,10 +12,20 @@ const productSchema = new mongoose.Schema(
             required: false,
             unique: false,
         },
+        roast_level: {
+            type: String,
+            required: false,
+            unique: false,
+        },
+        image: {
+            type: String,
+            required: false,
+            unique: false,
+        },
         category: {
             type: mongoose.Types.ObjectId,
             ref: "ProductCategory",
-            required: false,
+            required: true,
             unique: false,
         },
         price: {
@@ -44,7 +54,17 @@ const productSchema = new mongoose.Schema(
             type: String,
             required: false,
             unique: false,
-        }]
+        }],
+        ingredients: [{
+            type: String,
+            required: true,
+            unique: false,
+        }],
+        enabled: {
+            type: Boolean,
+            required: true,
+            unique: false,
+        }
     }, {
         timestamps: true,
     }

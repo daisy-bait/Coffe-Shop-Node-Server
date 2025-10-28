@@ -34,7 +34,8 @@ export const runDataLoader = async() => {
                 password: encodedPassword,
                 email: "u20231213624@usco.edu.co",
                 name: "Kaleth Daniel Narváez Paredes",
-                roles: roles
+                roles: roles,
+                enabled: true
             })
         ].map(user => user.save());
 

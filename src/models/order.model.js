@@ -8,6 +8,12 @@ const orderSchema = new mongoose.Schema(
             required: true,
             unique: false,
         },
+        order_details: [{
+            type: mongoose.Types.ObjectId,
+            ref: "OrderDetail",
+            required: true,
+            unique: false,
+        }],
         total_price: {
             type: Number,
             required: true,
@@ -18,6 +24,8 @@ const orderSchema = new mongoose.Schema(
             required: true,
             unique: false
         }
+    }, {
+        timestamps: true,
     }
 )
 

@@ -1,10 +1,12 @@
 import express from "express";
 import morgan from "morgan";
+import cors from "cors";
 
 import userRoutes from "../routes/user.route.js"
 import roleRoutes from "../routes/role.route.js"
 import productRoutes from "../routes/product.route.js"
 import productCategoryRoutes from "../routes/productCategory.route.js"
+import orderRoutes from "../routes/order.route.js"
 
 /**
  * @description Función para configurar express para:
@@ -16,11 +18,21 @@ import productCategoryRoutes from "../routes/productCategory.route.js"
  * @param {express} app
  */
 export default function(app) {
+    // CORS Config
+    app.use(
+        cors({
+            credentials: true,
+            origin: "http://localhost:5173",
+            allowedHeaders: ["Content-Type", "Authorization"]
+        })
+    )
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(morgan('dev'));
 
     // Rutas, o Endpoints
+    app.use("/api/orders", orderRoutes);
     app.use("/api/users", userRoutes);
     app.use("/api/roles", roleRoutes);
     app.use("/api/products", productRoutes);

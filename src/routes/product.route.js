@@ -1,10 +1,17 @@
 import { Router } from "express";
-import { createProduct, getProduct } from "../controllers/product.controller.js";
+import { createProduct, modifyProduct, searchProductsByParams, activateProduct, disableProduct } from "../controllers/product.controller.js";
+import { auth } from "../middlewares/auth.middleware.js";
 
 const router = new Router();
 
-router.get("/search/:id", getProduct);
+router.post("/create/", auth(["ADMIN"]), createProduct);
 
-router.post("/create/", createProduct);
+router.put("/modify/:id", auth(["ADMIN"]), modifyProduct);
+
+router.get("/search/", searchProductsByParams);
+
+router.patch("/activate/:id", auth(["ADMIN"]), activateProduct);
+
+router.delete("/disable/:id", auth(["ADMIN"]), disableProduct);
 
 export default router;
