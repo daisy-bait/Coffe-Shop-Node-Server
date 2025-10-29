@@ -124,7 +124,7 @@ jobs:
                 commits = [{ hash, message }];
               }
             } else {
-              const gitLog = execSync('git log origin/main..HEAD --pretty=format:"%H|%s"', { encoding: 'utf8' });
+              const gitLog = execSync('git log origin/develop..HEAD --pretty=format:"%H|%s"', { encoding: 'utf8' });
               commits = gitLog.trim().split('\n').map(line => {
                 const [hash, message] = line.split('|');
                 return { hash, message };
