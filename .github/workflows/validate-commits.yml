@@ -36,7 +36,7 @@ jobs:
       run: |
         cat > validate-commit.js << 'EOF'
         import axios from "axios";
-        const { execSync } = require('child_process');
+        import { execSync } from "child_process";
 
         const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
         const JIRA_EMAIL = process.env.JIRA_EMAIL;
