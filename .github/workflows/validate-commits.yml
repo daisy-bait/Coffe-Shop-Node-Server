@@ -138,6 +138,12 @@ jobs:
             for (const commit of commits) {
               console.log(`\nAnalyzing commit: ${commit.hash.substring(0, 7)}`);
               console.log(`   Message: ${commit.message}`);
+
+              // 🟨 Saltar commits de tipo "Merge"
+              if (commit.message.startsWith("Merge")) {
+                console.log("   ⚠️  Skipping merge commit.");
+                continue;
+              }
               
               const jiraKeys = extractJiraKeys(commit.message);
               
