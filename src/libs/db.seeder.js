@@ -26,7 +26,7 @@ export const runDataLoader = async() => {
 
         const roleAdmin = await roleModel.find({ name: "ADMIN" }).exec();
         const roles = [ roleAdmin[0] ];
-        const encodedPassword = await bcrypt.hash("200548", 10);
+        const encodedPassword = await bcrypt.hash("Kaleth_2006", 10);
 
         const users = [
             new userModel({
