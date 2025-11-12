@@ -5,14 +5,14 @@ export const auth = (roles = []) => {
     try {
       const authHeader = req.headers.authorization;
 
-      if (!authHeader) return res.status(401).json({ message: "Not Authenticated" });
+      if (!authHeader) return res.status(401).json({ message: "No has iniciado Sesión" });
 
       const token = authHeader.split(" ")[1];
 
       const validToken = await verifyToken(token);
 
       if (!validToken)
-        return res.status(401).json({ message: "Invalid Token" });
+        return res.status(401).json({ message: "Sesión Caducada" });
 
       if (roles.length > 0) {
         const userRoles = validToken.roles;
@@ -27,7 +27,7 @@ export const auth = (roles = []) => {
         });
 
         if (validRoles === 0) {
-          return res .status(403) .json({ message: "Forbbiden: Not Valid Roles" });
+          return res .status(403) .json({ message: "Prohibido, no tienes roles válidos" });
         }
       }
 

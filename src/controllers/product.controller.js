@@ -1,6 +1,5 @@
 import productModel from "../models/products.model.js";
 import productCategoryModel from "../models/productCategory.model.js";
-import userModel from "../models/user.model.js";
 
 export const createProduct = async (req, res) => {
   try {
@@ -249,6 +248,7 @@ const verifyDuplicateName = async (name) => {
     return false;
   } catch (error) {
     console.log(error);
+    throw new Error(error.message);
   }
 };
 
@@ -263,5 +263,6 @@ const verifyDuplicateRecommendation = async (recommendation) => {
     return false;
   } catch (error) {
     console.log(error);
+    throw new Error(error.message);
   }
 };
