@@ -8,6 +8,7 @@ import productRoutes from "../routes/product.route.js"
 import productCategoryRoutes from "../routes/productCategory.route.js"
 import orderRoutes from "../routes/order.route.js"
 import blogRoutes from "../routes/blog.route.js"
+import commentRoutes from "../routes/comment.route.js"
 
 /**
  * @description Función para configurar express para:
@@ -39,4 +40,5 @@ export default function(app) {
     app.use("/api/products", productRoutes);
     app.use("/api/product-categories", productCategoryRoutes);
     app.use("/api/blogs/", blogRoutes);
+    app.use("/api/comments/", commentRoutes);
 }
