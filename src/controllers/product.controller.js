@@ -171,7 +171,6 @@ export const disableProduct = async (req, res) => {
 export const searchProductsByParams = async (req, res) => {
   try {
     const params = req.query;
-    console.log(params);
     res.json(await getProducts(params));
   } catch (error) {
     return res.status(500).json(error.message);

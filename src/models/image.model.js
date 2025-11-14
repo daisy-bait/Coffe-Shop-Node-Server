@@ -6,11 +6,6 @@ const imageSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: false,
-        },
-        isB64: {
-            type: Boolean,
-            required: true,
-            unique: false,
         }
     }
 );

@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { createBlog } from "../controllers/blog.controller";
+import { createBlog, searchBlogByParams } from "../controllers/blog.controller.js";
+import { auth } from "../middlewares/auth.middleware.js";
 
 const router = new Router();
 
-router.post("/create/", createBlog);
+router.post("/create/", auth([]), createBlog);
+
+router.get("/search/", searchBlogByParams);
 
 export default router;
