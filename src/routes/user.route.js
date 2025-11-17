@@ -26,9 +26,9 @@ router.get("/search/", searchUserByParams);
 
 router.get("/verify-session/", verifySession);
 
-router.delete("/disable/:id", auth(["ADMIN", "CUSTOMER"]), disableUser);
-
 router.patch("/activate/:id", auth(["ADMIN"]), activateUser);
+
+router.delete("/disable/:id", auth(["ADMIN", "CUSTOMER"]), disableUser);
 
 // Ruta para Recuperar Contraseña y Confirmación de Email en Registro
 

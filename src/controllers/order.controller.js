@@ -166,17 +166,18 @@ export const modifyOrderStatus = async (req, res) => {
 
 export const searchOrdersByParams = async (req, res) => {
   try {
-    console.log(req.body);
     const { username } = req.query;
 
     const foundUser = await userModel.findOne({ username: username });
 
-    if (!foundUser) {
-      return res.json([]);
+    const queries = {};
+
+    if (foundUser) {
+      queries.client = foundUser._id;
     }
 
     const foundOrders = await orderModel
-      .find({ client: foundUser._id })
+      .find(queries)
       .populate({
         path: "client",
         select: "-password -__v -createdAt -updatedAt -roles"

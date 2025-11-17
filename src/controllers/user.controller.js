@@ -380,7 +380,6 @@ export const getUser = async (id, username, email, name, enabled) => {
     if (email) queries.email = new RegExp(email, "i");
     if (name) queries.name = new RegExp(name, "i");
     if (enabled) queries.enabled = enabled;
-    else queries.enabled = true;
 
     const user = await userModel
       .find(queries, { password: 0, __v: 0 })
