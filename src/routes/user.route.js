@@ -1,5 +1,17 @@
 import { Router } from "express";
-import { loginUser, registerUser, modifyUser, searchUserByParams, verifySession, activateUser, disableUser } from "../controllers/user.controller.js";
+import {
+  loginUser,
+  registerUser,
+  modifyUser,
+  searchUserByParams,
+  verifySession,
+  activateUser,
+  disableUser,
+  requestCode,
+  verifyCode,
+  resetPassword,
+  confirmRegister,
+} from "../controllers/user.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
 const router = new Router();
@@ -17,5 +29,15 @@ router.get("/verify-session/", verifySession);
 router.delete("/disable/:id", auth(["ADMIN", "CUSTOMER"]), disableUser);
 
 router.patch("/activate/:id", auth(["ADMIN"]), activateUser);
+
+// Ruta para Recuperar Contraseña y Confirmación de Email en Registro
+
+router.post("/password-recovery", requestCode);
+
+router.post("/verify-code", verifyCode);
+
+router.post("/reset-password", resetPassword);
+
+router.post("/confirm-email/", confirmRegister);
 
 export default router;
