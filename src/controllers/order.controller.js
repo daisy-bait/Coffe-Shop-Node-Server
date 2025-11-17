@@ -137,6 +137,18 @@ export const modifyOrderStatus = async (req, res) => {
         .json({ message: "La orden ya se encuentra cancelada o completada" });
     }
 
+    if(status === "CANCELADA") {
+      // Restaurar el stock de los productos en la orden
+      const orderDetails = await orderDetailModel.find({ _id: { $in: toModifyOrder.order_details } });
+      for (const detail of orderDetails) {
+        const product = await productsModel.findById(detail.product);
+        if (product) {
+          product.stock += detail.quantity;
+          await product.save();
+        }
+      }
+    }
+
     const modifiedOrder = await orderModel.findOneAndUpdate(
       { _id: orderId },
       { status: status },
