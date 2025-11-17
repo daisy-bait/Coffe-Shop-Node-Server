@@ -216,7 +216,6 @@ const getProducts = async (params) => {
     }
     if (origin) queries.origin = new RegExp(origin, "i");
     if (enabled) queries.enabled = enabled;
-    else queries.enabled = true;
 
     console.log(queries);
     const foundProducts = await productModel
