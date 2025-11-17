@@ -49,6 +49,7 @@ const getComments = async (params) => {
 
         const foundComments = await commentModel
         .find(queries)
+        .sort({ updatedAt: -1 })
         .populate("user blog");
         return foundComments;
     } catch (error) {

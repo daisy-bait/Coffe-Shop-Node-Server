@@ -154,19 +154,30 @@ export const modifyOrderStatus = async (req, res) => {
 
 export const searchOrdersByParams = async (req, res) => {
   try {
-    const { username } = req.body;
+    console.log(req.body);
+    const { username } = req.query;
 
     const foundUser = await userModel.findOne({ username: username });
 
     if (!foundUser) {
-      return res.status(400).json({
-        message: `No hay un usuario con ese nombre de usuario: ${username}`,
-      });
+      return res.json([]);
     }
 
     const foundOrders = await orderModel
       .find({ client: foundUser._id })
-      .sort({ createdAt: -1 });
+      .populate({
+        path: "client",
+        select: "-password -__v -createdAt -updatedAt -roles"
+      })
+      .populate({
+        path: "order_details",
+        select: "-__v",
+        populate: {
+          path: "product",
+          select: "-__v -benefits -createdAt -updatedAt -category -image -enabled -ingredients -stock -roast_level -origin -recommendations",
+        },
+      })
+      .sort({ updatedAt: -1 });
 
       return res.status(200).json(foundOrders);
   } catch (error) {
