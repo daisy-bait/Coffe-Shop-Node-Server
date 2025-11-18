@@ -137,6 +137,18 @@ export const modifyOrderStatus = async (req, res) => {
         .json({ message: "La orden ya se encuentra cancelada o completada" });
     }
 
+    if(status === "CANCELADA") {
+      // Restaurar el stock de los productos en la orden
+      const orderDetails = await orderDetailModel.find({ _id: { $in: toModifyOrder.order_details } });
+      for (const detail of orderDetails) {
+        const product = await productsModel.findById(detail.product);
+        if (product) {
+          product.stock += detail.quantity;
+          await product.save();
+        }
+      }
+    }
+
     const modifiedOrder = await orderModel.findOneAndUpdate(
       { _id: orderId },
       { status: status },
@@ -154,19 +166,31 @@ export const modifyOrderStatus = async (req, res) => {
 
 export const searchOrdersByParams = async (req, res) => {
   try {
-    const { username } = req.body;
+    const { username } = req.query;
 
     const foundUser = await userModel.findOne({ username: username });
 
-    if (!foundUser) {
-      return res.status(400).json({
-        message: `No hay un usuario con ese nombre de usuario: ${username}`,
-      });
+    const queries = {};
+
+    if (foundUser) {
+      queries.client = foundUser._id;
     }
 
     const foundOrders = await orderModel
-      .find({ client: foundUser._id })
-      .sort({ createdAt: -1 });
+      .find(queries)
+      .populate({
+        path: "client",
+        select: "-password -__v -createdAt -updatedAt -roles"
+      })
+      .populate({
+        path: "order_details",
+        select: "-__v",
+        populate: {
+          path: "product",
+          select: "-__v -benefits -createdAt -updatedAt -category -image -enabled -ingredients -stock -roast_level -origin -recommendations",
+        },
+      })
+      .sort({ updatedAt: -1 });
 
       return res.status(200).json(foundOrders);
   } catch (error) {

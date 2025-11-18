@@ -1,36 +1,27 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const blogSchema = new mongoose.Schema(
     {
-        username: {
+        title: {
             type: String,
             required: true,
             unique: true,
         },
-        password: {
+        content: {
             type: String,
             required: true,
-            unique: false,
+            unique: true,
         },
-        email: {
-            type: String,
-            required: true,
-            unique: false,
-        },
-        name: {
-            type: String,
-            required: true,
-            unique: false,
-        },
-        roles: [{
+        user: {
             type: mongoose.Types.ObjectId,
-            ref: "Role",
+            ref: "User",
             required: true,
             unique: false,
-        }],
-        isVerified: {
-            type: Boolean,
-            required: true,
+        },
+        image: {
+            type: mongoose.Types.ObjectId,
+            ref: "Image",
+            required: false,
             unique: false,
         },
         enabled: {
@@ -42,6 +33,6 @@ const userSchema = new mongoose.Schema(
     {
         timestamps: true,
     }
-)
+);
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model("Blog", blogSchema);

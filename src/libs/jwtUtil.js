@@ -4,7 +4,7 @@ import { getUser, searchUserByParams } from "../controllers/user.controller.js";
 
 export const createAccessToken = async(payload) => {
     return new Promise((resolve, reject) => {
-        jwt.sign(payload, configEnv.jwtSecret, { expiresIn: "10m" }, (error, token) => {
+        jwt.sign(payload, configEnv.jwtSecret, { expiresIn: "15m" }, (error, token) => {
             if (error) {
                 reject(error);
             }

@@ -1,6 +1,5 @@
 import productModel from "../models/products.model.js";
 import productCategoryModel from "../models/productCategory.model.js";
-import userModel from "../models/user.model.js";
 
 export const createProduct = async (req, res) => {
   try {
@@ -172,7 +171,6 @@ export const disableProduct = async (req, res) => {
 export const searchProductsByParams = async (req, res) => {
   try {
     const params = req.query;
-    console.log(params);
     res.json(await getProducts(params));
   } catch (error) {
     return res.status(500).json(error.message);
@@ -218,7 +216,6 @@ const getProducts = async (params) => {
     }
     if (origin) queries.origin = new RegExp(origin, "i");
     if (enabled) queries.enabled = enabled;
-    else queries.enabled = true;
 
     console.log(queries);
     const foundProducts = await productModel
@@ -249,6 +246,7 @@ const verifyDuplicateName = async (name) => {
     return false;
   } catch (error) {
     console.log(error);
+    throw new Error(error.message);
   }
 };
 
@@ -263,5 +261,6 @@ const verifyDuplicateRecommendation = async (recommendation) => {
     return false;
   } catch (error) {
     console.log(error);
+    throw new Error(error.message);
   }
 };
