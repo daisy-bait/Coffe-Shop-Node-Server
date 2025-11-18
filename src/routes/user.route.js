@@ -11,6 +11,8 @@ import {
   verifyCode,
   resetPassword,
   confirmRegister,
+  updateUserRoles,
+  deleteUserRoles,
 } from "../controllers/user.controller.js";
 import { auth } from "../middlewares/auth.middleware.js";
 
@@ -39,5 +41,11 @@ router.post("/verify-code", verifyCode);
 router.post("/reset-password", resetPassword);
 
 router.post("/confirm-email/", confirmRegister);
+
+// Gestión de roles
+
+router.patch("/update-role/:id", updateUserRoles);
+
+router.patch("/delete-role/:id", deleteUserRoles);
 
 export default router;
