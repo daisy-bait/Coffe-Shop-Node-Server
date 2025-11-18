@@ -32,7 +32,7 @@ router.delete("/disable/:id", auth(["ADMIN", "CUSTOMER"]), disableUser);
 
 // Ruta para Recuperar Contraseña y Confirmación de Email en Registro
 
-router.post("/password-recovery", requestCode);
+router.post("/request-code", requestCode);
 
 router.post("/verify-code", verifyCode);
 

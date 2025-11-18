@@ -19,7 +19,18 @@ export const registerUser = async (req, res) => {
           message: `Ya existe un Usuario con este Username: ${username}`,
         });
       } else {
-        foundUser.deleteOne();
+        console.log(await userModel.findByIdAndDelete(foundUser._id));
+      }
+    }
+
+    if (await verifyDuplicateEmail(email)) {
+      const foundUserEmail = await userModel.findOne({ email: email });
+      if (foundUserEmail && foundUserEmail.isVerified) {
+        return res.status(400).json({
+          message: `Ya existe un Usuario con este Email: ${email}`,
+        });
+      } else {
+        console.log(await userModel.findByIdAndDelete(foundUserEmail._id));
       }
     }
 
@@ -394,6 +405,18 @@ export const getUser = async (id, username, email, name, enabled) => {
 const verifyDuplicateUsername = async (username) => {
   try {
     const user = await userModel.findOne({ username: username });
+    if (user) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const verifyDuplicateEmail = async (email) => {
+  try {
+    const user = await userModel.findOne({ email: email });
     if (user) {
       return true;
     }
