@@ -59,6 +59,20 @@ export const searchBlogByParams = async (req, res) => {
     }
 }
 
+export const deleteBlogById = async (req, res) => {
+    try {
+        const blogId = req.params.id;
+        const toDeleteBlog = await blogModel.findByIdAndDelete(blogId);
+        if (toDeleteBlog) {
+            return res.json(toDeleteBlog);
+        }
+        return res.status(404).json({ message: "No se encontró el comentario" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 // METODOS NO WEB
 
 const verifyDuplicateTitle = async (title) => {

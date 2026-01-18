@@ -31,6 +31,20 @@ export const searchCommentsByParams = async (req, res) => {
     }
 };
 
+export const deleteComment = async (req, res) => {
+    try {
+        const commentId = req.params.id;
+        const toDeleteComment = await commentModel.findByIdAndDelete(commentId);
+        if (toDeleteComment) {
+            return res.json(toDeleteComment);
+        }
+        return res.status(404).json({ message: "No se encontró el comentario" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
 // METODOS NO WEB
 
 const getComments = async (params) => {

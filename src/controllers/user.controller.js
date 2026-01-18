@@ -157,6 +157,88 @@ export const modifyUser = async (req, res) => {
   }
 };
 
+export const updateUserRoles = async (req, res) => {
+  try {
+    const { role: roleName } = req.body;
+
+    const role = await roleModel.findOne({ name: roleName });
+    if (!role) {
+      return res.status(404).json({ message: "Rol no encontrado" });
+    }
+
+    const user = await userModel.findById(req.params.id).populate("roles");
+    if (!user) {
+      return res.status(404).json({
+        message: `No existe un Usuario con este id: ${req.params.id}`,
+      });
+    }
+
+    // Verificar si ya tiene el rol
+    const hasRole = user.roles.some(r => r._id.toString() === role._id.toString());
+
+    if (hasRole) {
+      return res.status(400).json({
+        message: `El usuario ya tiene el rol '${roleName}'`,
+      });
+    }
+
+    // Agregar el rol
+    user.roles.push(role._id);
+    await user.save();
+
+    return res.status(200).json({
+      message: `Rol '${roleName}' agregado correctamente`,
+      user,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+}
+
+export const deleteUserRoles = async (req, res) => {
+  try {
+    const { role: roleName } = req.body;
+
+    const role = await roleModel.findOne({ name: roleName });
+    if (!role) {
+      return res.status(404).json({ message: "Rol no encontrado" });
+    }
+
+    const user = await userModel.findById(req.params.id).populate("roles");
+    if (!user) {
+      return res.status(404).json({
+        message: `No existe un Usuario con este id: ${req.params.id}`,
+      });
+    }
+
+    // Verificar si NO tiene el rol
+    const hasRole = user.roles.some(r => r._id.toString() === role._id.toString());
+
+    if (!hasRole) {
+      return res.status(400).json({
+        message: `El usuario no tiene el rol '${roleName}', no puede eliminarlo`,
+      });
+    }
+
+    // Quitar el rol
+    user.roles = user.roles.filter(
+      r => r._id.toString() !== role._id.toString()
+    );
+
+    await user.save();
+
+    return res.status(200).json({
+      message: `Rol '${roleName}' eliminado correctamente`,
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 export const activateUser = async (req, res) => {
   try {
     const userActivated = await userModel
