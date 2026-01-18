@@ -26,7 +26,7 @@ export const runDataLoader = async() => {
 
         const roleAdmin = await roleModel.find({ name: "ADMIN" }).exec();
         const roles = [ roleAdmin[0] ];
-        const encodedPassword = await bcrypt.hash("Kaleth_2006", 10);
+        const encodedPassword = await bcrypt.hash("admin", 10);
 
         const users = [
             new userModel({
@@ -35,6 +35,7 @@ export const runDataLoader = async() => {
                 email: "u20231213624@usco.edu.co",
                 name: "Kaleth Daniel Narváez Paredes",
                 roles: roles,
+                isVerified: true,
                 enabled: true
             })
         ].map(user => user.save());
